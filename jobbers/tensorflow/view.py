@@ -82,7 +82,7 @@ def ask_gpus():
     questions = [
         inquirer.List('gpus',
                       message="Needed GPUs",
-                      choices=[1,2,4,8],),
+                      choices=[0,1,2,4,8],),
     ]
     
     return inquirer.prompt(questions)

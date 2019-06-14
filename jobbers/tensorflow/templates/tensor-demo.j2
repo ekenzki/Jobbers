@@ -6,6 +6,8 @@
 #SBATCH --partition {{job.partitions|join(",")}}   # which partitions to consider
 #SBATCH --output      MyTensorJob.%j.out # Include the job ID in the names of
 #SBATCH --error       MyTensorJob.%j.err # the output and error files
+{% if job.gpus > 0 -%} #SBATCH --gres=gpu:{{ job.gpus }} {%- endif %}
+
 
 workdir=$SLURM_SUBMIT_DIR
 scratch={{ job.scratch }}
@@ -18,11 +20,12 @@ python3 -m venv venv
 source venv/bin/activate
 
 pip install --upgrade pip
-pip install --upgrade tensorflow requests wheel
 
-if [ ! 1 ]; then
- pip install tensorflow-gpu
-fi
+{% if job.gpus > 0 -%}
+pip install tensorflow-gpu
+{% else %}
+pip install --upgrade tensorflow requests wheel
+{% endif %}
 
 # Test 
 python -c "import tensorflow as tf; tf.enable_eager_execution(); print(tf.reduce_sum(tf.random_normal([1000, 1000])))"
